@@ -14,14 +14,23 @@ RUN wget http://ardownload.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr
 RUN DEBIAN_FRONTEND=noninteractive dpkg -i --force-architecture AdbeRdr9.5.5-1_i386linux_enu.deb
 # license? ~/.adobe? /opt/Adobe/Reader9/Reader/GlobalPrefs/reader_prefs? elsewhere?
 
+# edeklaracje
 RUN wget -O /opt/edeklaracje.air http://www.finanse.mf.gov.pl/documents/766655/1196444/e-DeklaracjeDesktop.air
 RUN xvfb-run '/opt/Adobe AIR/Versions/1.0/Adobe AIR Application Installer' -silent -eulaAccepted /opt/edeklaracje.air
 
-ENV DISPLAY :0
-ADD run.sh /opt/run.sh
-RUN chmod a+x /opt/run.sh
+# właściwe locale jest właściwe
+# http://jaredmarkell.com/docker-and-locales/
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y language-pack-pl-base
+RUN locale-gen pl_PL.UTF-8
+ENV LANG pl_PL.UTF-8
+ENV LANGUAGE pl_PL:pl
+ENV LC_ALL pl_PL.UTF-8
+
+# reszta ustawień
+ADD run.sh /opt/wrapper.sh
+RUN chmod a+x /opt/wrapper.sh
 WORKDIR /opt
 
-RUN echo "Run with: XSOCK=/tmp/.X11-unix/X0; -v $XSOCK:$XSOCK"
+RUN echo -ne "\n\nUruchom za pomocą ./edeklaracje.sh\n\n"
 
-ENTRYPOINT ["/opt/run.sh"]
+ENTRYPOINT ["/opt/wrapper.sh"]
