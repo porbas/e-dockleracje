@@ -36,10 +36,6 @@ IMAGE_NAME="edeklaracje"
 # nazwa kontenera
 CONTAINER_NAME="$IMAGE_NAME"
 
-# katalog z konfiguracją eDeklaracji na lokalnym hoście i w dockerze
-EDEKLARACJE_CONFDIR="$HOME/.eDeklaracje"
-EDEKLARACJE_DOCKDIR="/.eDeklaracje"
-
 # mamy dockera?
 if ! docker --version >/dev/null; then
   echo -ne '\nNie znalazłem dockera -- czy jest zainstalowany?\n\n'
@@ -74,11 +70,22 @@ if [[ `docker inspect -f '{{.State}}' "$CONTAINER_NAME"` != '<no value>' ]]; the
   docker rm -v "$CONTAINER_NAME"
 fi
 
+# na wszelki wypadek pytamy juzera
+if [ -e "$HOME"/.appdata/e-Deklaracje* ]; then
+  EDEKLARACJE_DIR=`echo $HOME/.appdata/e-Deklaracje* `
+  echo -ne "\n\nUWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA\nUżyty zostanie istniejący profil e-Deklaracji.\n\nMOCNO ZALECANE JEST ZROBIENIE KOPII ZAPASOWEJ PRZED KONTYNUOWANIEM!\n\nProfil znajduje się w katalogu:\n$EDEKLARACJE_DIR\n\nCzy zrobiłeś kopię zapasową i chcesz kontynuować? (t/N) "
+  read BUILD
+  if [[ $BUILD != 't' ]]; then
+    echo -ne 'Anulowano.\n\n'
+    exit 0
+  fi
+fi
+
 # jedziemy
-echo -ne "\nUruchamiam kontener $CONTAINER_NAME...\n\n"
+echo -ne "\nUruchamiam kontener $CONTAINER_NAME...\n"
 docker run --rm -ti \
   -v "$XSOCK":"$XSOCK" \
-  -v "$EDEKLARACJE_CONFDIR":"$EDEKLARACJE_DOCKDIR" \
+  -v "$HOME/.appdata":"$HOME/.appdata" \
   -e EDEKLARACJE_USER="$USER" \
   -e EDEKLARACJE_UID="` id -u $USER `" \
   -e EDEKLARACJE_GID="` id -g $USER `" \
