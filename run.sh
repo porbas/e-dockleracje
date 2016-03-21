@@ -27,7 +27,21 @@ fi
 groupadd -g "$EDEKLARACJE_GID" "$EDEKLARACJE_GROUP"
 useradd -d "$EDEKLARACJE_HOME" -u "$EDEKLARACJE_UID" -g "$EDEKLARACJE_GID" -s /bin/bash "$EDEKLARACJE_USER"
 mkdir -p "$EDEKLARACJE_HOME"
+
+# akceptacja licencji Adobe Reader
+mkdir -p $EDEKLARACJE_HOME/.adobe/Acrobat/9.0/Preferences
+echo "<</AVPrivate [/c <<     /ChooseLangAtStartup [/b false]
+        /EULAAcceptanceTime [/i 1]
+        /SplashDisplayedAtStartup [/b false]
+        /UnixLanguageStartup [/i 4542037]
+        /showEULA [/b false]
+>>]
+>>" > $EDEKLARACJE_HOME/.adobe/Acrobat/9.0/Preferences/reader_prefs
+
 chown -R "$EDEKLARACJE_UID":"$EDEKLARACJE_GID" "$EDEKLARACJE_HOME"
+
+# ustawienie adresu ip hosta do CUPS
+sed -i "s/HOST_IP/$HOST_IP/" /etc/cups/client.conf
 
 exec su - $EDEKLARACJE_USER -c "
 # magic: http://www.linuxquestions.org/questions/linux-newbie-8/xlib-connection-to-0-0-refused-by-server-xlib-no-protocol-specified-152556/

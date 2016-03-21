@@ -32,6 +32,12 @@ RUN wget -O /opt/acroread.deb --progress=bar:force http://ardownload.adobe.com/p
 ADD http://www.finanse.mf.gov.pl/documents/766655/1196444/e-DeklaracjeDesktop.air /opt/edeklaracje.air
 RUN xvfb-run '/opt/Adobe AIR/Versions/1.0/Adobe AIR Application Installer' -silent -eulaAccepted /opt/edeklaracje.air
 
+#drukowanie
+#http://superuser.com/questions/101675/printing-via-adobe-reader-under-linux-and-cups
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install cups-client cups-bsd
+ADD cups_client.conf /etc/cups/client.conf
+# właściwe ustawienie adresu jest przy odpalaniu kontenera - w skrypcie wrapper.sh
+# UWAGA - pamiętaj o zmienie konfiguracji CUPS hosta zgodnie z opisem
 
 # reszta ustawień
 ADD run.sh /opt/wrapper.sh

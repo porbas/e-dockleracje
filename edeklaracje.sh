@@ -31,7 +31,7 @@ COOKIE=`xauth list $DISPLAY | sed -r -e 's/^.+MIT/MIT/'`
 XSOCK="/tmp/.X11-unix/X0"
 
 # nazwa obrazu dockera
-IMAGE_NAME="edeklaracje"
+IMAGE_NAME="edeklaracje_lts"
 
 # nazwa kontenera
 CONTAINER_NAME="$IMAGE_NAME"
@@ -43,11 +43,11 @@ if ! docker --version >/dev/null; then
 fi
 
 # czy istnieje już obraz o nazwie $IMAGE_NAME?
-if docker inspect edeklaracje >/dev/null; then
+if docker inspect edeklaracje_lts >/dev/null; then
   # używamy go, czy budujemy od nowa?
-  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (t/N) "
+  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (T/n) "
   read BUILD
-  if [[ $BUILD == 't' ]]; then
+  if [[ $BUILD != 'n' ]]; then
     echo -ne '\nBuduję obraz...\n\n'
     docker build -t $IMAGE_NAME ./
     echo -ne '\nObraz zbudowany.\n\n'
@@ -83,6 +83,10 @@ fi
 
 # jedziemy
 echo -ne "\nUruchamiam kontener $CONTAINER_NAME...\n"
+
+# http://stackoverflow.com/questions/22944631/how-to-get-the-ip-address-of-the-docker-host-from-inside-a-docker-container
+HOST_IP_DEV=`/sbin/ip route|awk '/default/ { print $5 }'`
+HOST_IP=`/sbin/ip -4 addr show $HOST_IP_DEV | grep -Po 'inet \K[\d.]+'`
 docker run --rm -ti \
   -v "$XSOCK":"$XSOCK" \
   -v "$HOME/.appdata":"$HOME/.appdata" \
@@ -93,4 +97,5 @@ docker run --rm -ti \
   -e EDEKLARACJE_HOME="$HOME" \
   -e MIT_COOKIE="$COOKIE" \
   -e DISPLAY="$DISPLAY" \
-  --name $CONTAINER_NAME $IMAGE_NAME 
+  -e HOST_IP="$HOST_IP" \
+  --name $CONTAINER_NAME $IMAGE_NAME edeklaracje_lts
