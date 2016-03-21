@@ -9,19 +9,6 @@ RUN set -e -x ; \
 RUN ln -s /usr/lib/i386-linux-gnu/libgnome-keyring.so.0 /usr/lib/libgnome-keyring.so.0
 RUN ln -s /usr/lib/i386-linux-gnu/libgnome-keyring.so.0.2.0 /usr/lib/libgnome-keyring.so.0.2.0
 
-ADD http://airdownload.adobe.com/air/lin/download/latest/AdobeAIRInstaller.bin /opt/air.bin
-RUN chmod +x /opt/air.bin
-RUN xvfb-run /opt/air.bin -silent -eulaAccepted
-
-# via http://ask.xmodulo.com/install-adobe-reader-ubuntu-13-10.html
-ADD http://ardownload.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb /opt/acroread.deb
-RUN DEBIAN_FRONTEND=noninteractive dpkg -i --force-architecture /opt/acroread.deb
-# license? ~/.adobe? /opt/Adobe/Reader9/Reader/GlobalPrefs/reader_prefs? elsewhere?
-
-# edeklaracje
-ADD http://www.finanse.mf.gov.pl/documents/766655/1196444/e-DeklaracjeDesktop.air /opt/edeklaracje.air
-RUN xvfb-run '/opt/Adobe AIR/Versions/1.0/Adobe AIR Application Installer' -silent -eulaAccepted /opt/edeklaracje.air
-
 # właściwe locale jest właściwe
 # http://jaredmarkell.com/docker-and-locales/
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y language-pack-pl-base
@@ -29,6 +16,22 @@ RUN locale-gen pl_PL.UTF-8
 ENV LANG pl_PL.UTF-8
 ENV LANGUAGE pl_PL:pl
 ENV LC_ALL pl_PL.UTF-8
+
+#http://docs.docker.com/engine/articles/dockerfile_best-practices/#add-or-copy
+RUN wget -O /opt/air.bin --progress=bar:force http://airdownload.adobe.com/air/lin/download/latest/AdobeAIRInstaller.bin \
+      && chmod +x /opt/air.bin \
+      && xvfb-run /opt/air.bin -silent -eulaAccepted \
+      && rm /opt/air.bin
+
+# via http://ask.xmodulo.com/install-adobe-reader-ubuntu-13-10.html
+RUN wget -O /opt/acroread.deb --progress=bar:force http://ardownload.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb \
+      && DEBIAN_FRONTEND=noninteractive dpkg -i --force-architecture /opt/acroread.deb \
+      && rm /opt/acroread.deb
+
+# ADD, bo inaczej nie ma jak zaktualizować edeklaracji aby pobrać nowe formularze
+ADD http://www.finanse.mf.gov.pl/documents/766655/1196444/e-DeklaracjeDesktop.air /opt/edeklaracje.air
+RUN xvfb-run '/opt/Adobe AIR/Versions/1.0/Adobe AIR Application Installer' -silent -eulaAccepted /opt/edeklaracje.air
+
 
 # reszta ustawień
 ADD run.sh /opt/wrapper.sh
