@@ -1,7 +1,4 @@
-FROM ubuntu:13.10
-
-# dzięki Tomasz "themad" Madycki
-RUN sed -i -e 's/archive.ubuntu.com\|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+FROM ubuntu:14.04
 
 RUN set -e -x ; \
       dpkg --add-architecture i386 ; \
