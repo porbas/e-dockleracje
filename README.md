@@ -5,6 +5,7 @@ Michał "rysiek" Woźniak opracował spsób uruchomienia e-Deklaracji pod linuxe
 # Moje zmiany:
 * można wydrukować formularze bezpośrenio z e-Deklaracji. UWAGA - musisz zmodyfikować konfigurację CUPS hosta zgodnie z info: http://stackoverflow.com/questions/31030609/printing-from-inside-a-docker-container
 ```
+# /etc/cups/cupsd.conf
 ...
 Listen *:631
 ...
