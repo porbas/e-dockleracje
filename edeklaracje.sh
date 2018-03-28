@@ -45,9 +45,9 @@ fi
 # czy istnieje już obraz o nazwie $IMAGE_NAME?
 if docker inspect edeklaracje_lts >/dev/null; then
   # używamy go, czy budujemy od nowa?
-  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (T/n) "
+  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (t/N) "
   read BUILD
-  if [[ $BUILD != 'n' ]]; then
+  if [[ $BUILD == 't' || $BUILD == 'T' ]]; then
     echo -ne '\nBuduję obraz...\n\n'
     docker build -t $IMAGE_NAME ./
     echo -ne '\nObraz zbudowany.\n\n'
