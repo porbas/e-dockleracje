@@ -71,15 +71,19 @@ if [[ `docker inspect -f '{{.State}}' "$CONTAINER_NAME"` != '<no value>' ]]; the
 fi
 
 # na wszelki wypadek pytamy juzera
-if [ -e "$HOME"/.appdata/e-Deklaracje* ]; then
-  EDEKLARACJE_DIR=`echo $HOME/.appdata/e-Deklaracje* `
-  echo -ne "\n\nUWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA\nUżyty zostanie istniejący profil e-Deklaracji.\n\nMOCNO ZALECANE JEST ZROBIENIE KOPII ZAPASOWEJ PRZED KONTYNUOWANIEM!\n\nProfil znajduje się w katalogu:\n$EDEKLARACJE_DIR\n\nCzy zrobiłeś kopię zapasową i chcesz kontynuować? (T/n) "
-  read BUILD
-  if [[ $BUILD == 'n' ]]; then
-    echo -ne 'Anulowano.\n\n'
-    exit 0
+# sprawdz czy profil istnieje ( https://stackoverflow.com/questions/6363441/check-if-a-file-exists-with-wildcard-in-shell-script )
+for profil in "$HOME"/.appdata/e-Deklaracje*; do
+  if [ -e "$profil" ]; then
+    EDEKLARACJE_DIR=`echo $HOME/.appdata/e-Deklaracje* `
+    echo -ne "\n\nUWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA\nUżyty zostanie istniejący profil e-Deklaracji.\n\nMOCNO ZALECANE JEST ZROBIENIE KOPII ZAPASOWEJ PRZED KONTYNUOWANIEM!\n\nProfil znajduje się w katalogu:\n$EDEKLARACJE_DIR\n\nCzy zrobiłeś kopię zapasową i chcesz kontynuować? (T/n) "
+    read BUILD
+    if [[ $BUILD == 'n' || $BUILD == 'N' ]]; then
+      echo -ne 'Anulowano.\n\n'
+      exit 0
+    fi
   fi
-fi
+  break
+done
 
 # jedziemy
 echo -ne "\nUruchamiam kontener $CONTAINER_NAME...\n"
