@@ -20,7 +20,7 @@ Odpowiedz twierdząco na pytanie:
 
 Wówczas zostanie pobrana i zainstalowana nowsza wersja e-deklaracji.
 
-# Moje zmiany w stosunku do pierwotnej wersji "ryśka"
+# Zmiany w stosunku do pierwotnej wersji "ryśka"
 
 * można wydrukować formularze bezpośrenio z e-Deklaracji. UWAGA - musisz zmodyfikować konfigurację CUPS hosta zgodnie z info: http://stackoverflow.com/questions/31030609/printing-from-inside-a-docker-container
 ```
