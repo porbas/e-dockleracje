@@ -46,7 +46,10 @@ sed -i "s/HOST_IP/$HOST_IP/" /etc/cups/client.conf
 exec su - $EDEKLARACJE_USER -c "
 # magic: http://www.linuxquestions.org/questions/linux-newbie-8/xlib-connection-to-0-0-refused-by-server-xlib-no-protocol-specified-152556/
 # na wszelki wypadek -- jeśli gid/uid/username się zgadzają, to powinno niby wszystko działać...
+touch ~/.Xauthority
 xauth add \$HOSTNAME/unix:0 $MIT_COOKIE
 # jedziemy!
+echo Docker: Uruchamiam e-Deklaracje...
+echo
 /opt/e-Deklaracje/bin/e-Deklaracje
 "

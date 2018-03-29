@@ -45,9 +45,9 @@ fi
 # czy istnieje już obraz o nazwie $IMAGE_NAME?
 if docker inspect edeklaracje_lts >/dev/null; then
   # używamy go, czy budujemy od nowa?
-  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (T/n) "
+  echo -n "Istnieje zbudowany obraz $IMAGE_NAME. Budować mimo to? (t/N) "
   read BUILD
-  if [[ $BUILD != 'n' ]]; then
+  if [[ $BUILD == 't' || $BUILD == 'T' ]]; then
     echo -ne '\nBuduję obraz...\n\n'
     docker build -t $IMAGE_NAME ./
     echo -ne '\nObraz zbudowany.\n\n'
@@ -64,22 +64,35 @@ else
 fi
 
 # czy przypadkiem nie ma uruchomionego innego dockera z tą samą nazwą?
-if [[ `docker inspect -f '{{.State}}' "$CONTAINER_NAME"` != '<no value>' ]]; then
-  echo -ne "Wygląda na to, że kontener $CONTAINER_NAME istnieje; zatrzymuję/niszczę, by móc uruchomić na nowo.\n\n"
-  docker stop "$CONTAINER_NAME"
-  docker rm -v "$CONTAINER_NAME"
-fi
-
-# na wszelki wypadek pytamy juzera
-if [ -e "$HOME"/.appdata/e-Deklaracje* ]; then
-  EDEKLARACJE_DIR=`echo $HOME/.appdata/e-Deklaracje* `
-  echo -ne "\n\nUWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA\nUżyty zostanie istniejący profil e-Deklaracji.\n\nMOCNO ZALECANE JEST ZROBIENIE KOPII ZAPASOWEJ PRZED KONTYNUOWANIEM!\n\nProfil znajduje się w katalogu:\n$EDEKLARACJE_DIR\n\nCzy zrobiłeś kopię zapasową i chcesz kontynuować? (T/n) "
-  read BUILD
-  if [[ $BUILD == 'n' ]]; then
+docker_state=$(docker inspect -f '{{.State}}' "$CONTAINER_NAME" 2> /dev/null)
+if [[ ! -z "$docker_state" && "$docker_state" != '<no value>' ]]; then
+  echo -ne "Wygląda na to, że kontener $CONTAINER_NAME jest uruchomiony. Czy zatrzymać/zniszczyć go, by móc uruchomić na nowo? (T/n) "
+  read restart_container
+  if [[ $restart_container != 'n' && $restart_container != 'N' ]]; then
+    echo -ne '\nZatrzymuję kontener...\n\n'
+    docker stop "$CONTAINER_NAME"
+    docker rm -v "$CONTAINER_NAME"
+    echo -ne '\nKontener zatrzymany.\n\n'
+  else
     echo -ne 'Anulowano.\n\n'
     exit 0
   fi
 fi
+
+# na wszelki wypadek pytamy juzera
+# sprawdz czy profil istnieje ( https://stackoverflow.com/questions/6363441/check-if-a-file-exists-with-wildcard-in-shell-script )
+for profil in "$HOME"/.appdata/e-Deklaracje*; do
+  if [ -e "$profil" ]; then
+    EDEKLARACJE_DIR=`echo $HOME/.appdata/e-Deklaracje* `
+    echo -ne "\n\nUWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA UWAGA\nUżyty zostanie istniejący profil e-Deklaracji.\n\nMOCNO ZALECANE JEST ZROBIENIE KOPII ZAPASOWEJ PRZED KONTYNUOWANIEM!\n\nProfil znajduje się w katalogu:\n$EDEKLARACJE_DIR\n\nCzy zrobiłeś kopię zapasową i chcesz kontynuować? (T/n) "
+    read BUILD
+    if [[ $BUILD == 'n' || $BUILD == 'N' ]]; then
+      echo -ne 'Anulowano.\n\n'
+      exit 0
+    fi
+  fi
+  break
+done
 
 # jedziemy
 echo -ne "\nUruchamiam kontener $CONTAINER_NAME...\n"
