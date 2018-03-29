@@ -49,5 +49,7 @@ exec su - $EDEKLARACJE_USER -c "
 touch ~/.Xauthority
 xauth add \$HOSTNAME/unix:0 $MIT_COOKIE
 # jedziemy!
+echo Docker: Uruchamiam e-Deklaracje...
+echo
 /opt/e-Deklaracje/bin/e-Deklaracje
 "
