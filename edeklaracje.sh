@@ -64,7 +64,8 @@ else
 fi
 
 # czy przypadkiem nie ma uruchomionego innego dockera z tą samą nazwą?
-if [[ `docker inspect -f '{{.State}}' "$CONTAINER_NAME"` != '<no value>' ]]; then
+docker_state=$(docker inspect -f '{{.State}}' "$CONTAINER_NAME" 2> /dev/null)
+if [[ ! -z "$docker_state" && "$docker_state" != '<no value>' ]]; then
   echo -ne "Wygląda na to, że kontener $CONTAINER_NAME istnieje; zatrzymuję/niszczę, by móc uruchomić na nowo.\n\n"
   docker stop "$CONTAINER_NAME"
   docker rm -v "$CONTAINER_NAME"
