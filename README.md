@@ -1,6 +1,7 @@
 # e-Dockleracje
 
-Michał "rysiek" Woźniak opracował spsób uruchomienia e-Deklaracji pod linuxem przy wykorzystaniu dockera: http://rys.io/pl/150.
+Michał "rysiek" Woźniak opracował sposób uruchomienia e-Deklaracji pod Linuxem przy wykorzystaniu Dockera.
+Jego oryginalne repozytorium (pierwotnie opublikowane na http://rys.io/pl/150, jednak obecnie nie działa), teraz dostępne na https://code.hackerspace.pl/rysiek/e-dockleracje/.
 
 # Instrukcja użycia
 
